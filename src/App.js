@@ -1,25 +1,24 @@
-import logo from './logo.svg';
+
 import './App.css';
+import Explore from './Explore';
+import MyBooking from './MyBookings';
+import MyListings from './MyListings';
+import Navbar from "./Navbar/index";
+import React,{useState} from "react";
+
 
 function App() {
+  const [isExploreSelected,setIsExploreSelected]=useState(true);
+  const [isMyBookingsSelected,setIsMyBookingsSelected]=useState(false);
+  const [isMyListingsSelected,setIsMyListingsSelected]=useState(false);
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    <>
+    <Navbar isExploreSelected={isExploreSelected} isMyBookingsSelected={isMyBookingsSelected} isMyListingsSelected={isMyListingsSelected} setIsMyBookingsSelected={setIsMyBookingsSelected} setIsMyListingsSelected={setIsMyListingsSelected} setIsExploreSelected={setIsExploreSelected}/>
+    {isExploreSelected && <Explore/>}
+    {isMyBookingsSelected && <MyBooking/>}
+    {isMyListingsSelected && <MyListings/>}
+    </>
+    );
 }
 
 export default App;

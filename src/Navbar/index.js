@@ -1,12 +1,17 @@
 import { Navbar, Link, Text, Avatar, Dropdown } from "@nextui-org/react";
 import { Layout } from "./Layout";
 import React,{useState} from "react";
-
-
-
+import { act } from "react-dom/test-utils";
+import { useNavigate } from "react-router-dom";
 
 
 export default function Nav({isMyListingsSelected,isMyBookingsSelected,isExploreSelected,setIsExploreSelected,setIsMyBookingsSelected,setIsMyListingsSelected}) {
+  const navigate=useNavigate();
+
+  const signOutHandler=()=>{
+    localStorage.removeItem('token');
+    navigate("/");
+  }
     //state variables
   const collapseItems = [
     "Profile",
@@ -84,7 +89,7 @@ export default function Nav({isMyListingsSelected,isMyBookingsSelected,isExplore
             <Dropdown.Menu
               aria-label="User menu actions"
               color="secondary"
-              onAction={(actionKey) => console.log({ actionKey })}
+              onAction={(actionKey) => (actionKey==="logout")?signOutHandler():0}
             >
               <Dropdown.Item key="profile" css={{ height: "$18" }}>
                 <Text b color="inherit" css={{ d: "flex" }}>

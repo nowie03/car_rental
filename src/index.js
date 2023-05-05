@@ -1,14 +1,69 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import React, { Children } from "react";
+import ReactDOM from "react-dom/client";
+import "./index.css";
+import App from "./App";
+import Login from "./Login/Login";
+import reportWebVitals from "./reportWebVitals";
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
+//next ui imports
+import { NextUIProvider } from "@nextui-org/react";
+
+//prime react
+//theme
+import "primereact/resources/themes/lara-light-indigo/theme.css";
+
+//core
+import "primereact/resources/primereact.min.css";
+
+import Car from "./Car";
+
+import {
+  ApolloClient,
+  InMemoryCache,
+  ApolloProvider,
+  gql,
+} from "@apollo/client";
+
+import { createBrowserRouter, Route, RouterProvider } from "react-router-dom";
+import Signup from "./Login/Signup";
+import RouteGuard from "./RouteGuard";
+
+const router = createBrowserRouter([
+  {
+  path:"/",
+  element:<RouteGuard/>,
+  children:[{
+    path:"",
+    element:<App/>
+  }]
+  },
+  {
+    // path: "/",
+    // element: <App />,
+    path:"/login",
+    element:<Login/>,
+  },
+  {
+    path:"/signup",
+    element:<Signup/>
+  }
+]);
+const client = new ApolloClient({
+  uri: "http://localhost:5213/graphql",
+  cache: new InMemoryCache(),
+  credentials: 'include'
+});
+
+
+const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
+  <ApolloProvider client={client}>
+  <NextUIProvider>
+    <React.StrictMode>
+      <RouterProvider router={router} />
+    </React.StrictMode>
+  </NextUIProvider>
+  </ApolloProvider>
 );
 
 // If you want to start measuring performance in your app, pass a function

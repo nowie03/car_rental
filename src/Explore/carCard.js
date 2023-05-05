@@ -5,28 +5,12 @@ import { Rating } from "primereact/rating";
 import { Link } from "react-router-dom";
 
 import "./CarCard.css";
+import BasicRating from "../MyBookings/Rating";
 
-export default function CarCard({ name, imageSource, price, onClickHandler }) {
+export default function CarCard({ name, imageSource, price, onClickHandler,model,kms,state,reg,owner,bookings }) {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // useEffect(() => {
-  //     const fetchData = async () => {
-  //         const response = await fetch('car', {
-  //             headers: {
-  //                 'Authorization': `Bearer #1536188#@$!%`
-  //             }
-
-  //         });
-  //         const data = await response.json();
-  //         setData(data);
-  //         console.log(data);
-  //         setLoading(false);
-  //     }
-
-  //     fetchData();
-
-  // }, []);
 
   return (
     <>
@@ -50,7 +34,7 @@ export default function CarCard({ name, imageSource, price, onClickHandler }) {
                 New
               </Text>
               <Text h3 color="white">
-                {name}
+                {name}{ " "+model}
               </Text>
             </Col>
           </Card.Header>
@@ -75,20 +59,15 @@ export default function CarCard({ name, imageSource, price, onClickHandler }) {
             }}
           >
             <Grid.Container>
-              <Grid xs={3} justify="flex-end">
+              <Grid xs={3} justify="flex-start">
                 <User
                   src="https://i.pravatar.cc/150?u=a042581f4e29026704d"
-                  name="Ariana Wattson"
+                  name={owner.email.split("@")[0]}
                   zoomed
                 />
               </Grid>
               <Grid xs={3}>
-                <Rating
-                  value={5}
-                  readOnly
-                  cancel={false}
-                  //style={{ marginLeft: "14px" }}
-                />
+                <BasicRating/>
               </Grid>
               <Grid xs={2}>
                 <Text
@@ -97,13 +76,13 @@ export default function CarCard({ name, imageSource, price, onClickHandler }) {
                   transform="uppercase"
                   color="black"
                 >
-                  TN 01 AG 342
+                  {state.split(" ")[0][0]+state.split(" ")[1][0]+ " "}{reg}
                 </Text>
               </Grid>
               <Grid xs={2}>
                 <Text size={13} color="default" weight="bold">
                   <Icon icon="saved" accessibilityLabel="Pin" color="default" />
-                  43
+                  {bookings}
                 </Text>
               </Grid>
 
@@ -122,7 +101,7 @@ export default function CarCard({ name, imageSource, price, onClickHandler }) {
                     weight="bold"
                     transform="uppercase"
                   >
-                    {price}
+                    {"$ "+price}
                   </Text>
                 </Button>
               </Grid>
