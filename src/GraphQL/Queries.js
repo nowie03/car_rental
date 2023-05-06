@@ -66,6 +66,7 @@ export const GET_LISTINGS = gql`
 export const GET_BOOKINGS = gql`
   query userBookings($userId: Int!) {
     userBookings(userId: $userId) {
+      id,
       startDate
       endDate
       bookedCar {

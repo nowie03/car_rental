@@ -2,7 +2,7 @@ import React from "react";
 import { Card, Row, Button, Text, Avatar,Grid } from "@nextui-org/react";
 import BasicRating from "./Rating";
 
-const BookingCard = ({car,startDate,endDate}) => {
+const BookingCard = ({id,car,startDate,endDate}) => {
   return (
     <Card css={{margin:"20px"}}>
       <Card.Header>

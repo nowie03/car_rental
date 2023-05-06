@@ -23,6 +23,11 @@ const Login = () => {
     errorPolicy: "all",
   });
 
+  const [
+    getUserByMail,
+    { called, loading: getUserByMailLoading, data: getUserByMailData },
+  ] = useLazyQuery(GET_USER_BY_MAIL);
+
   const [emailStatus, setEmailStatus] = useState({ color: "", text: "" });
   const [passwordStatus, setPasswordStatus] = useState({ color: "", text: "" });
 
@@ -42,18 +47,7 @@ const Login = () => {
     });
   }, [emailValue, passwordValue]);
 
-  if (error) {
-    console.log(data);
-    // setPasswordStatus({
-    //     text: "check your password",
-    //     color: "error",
-    // })
-    // setEmailStatus({
-    //     text:"check your email",
-    //     color:"error"
-    // })
-  }
-  useEffect(() => {
+  async function validateUser() {
     if (!loading && data) {
       setPasswordStatus({
         text: "",
@@ -82,11 +76,24 @@ const Login = () => {
           color: "error",
         });
       } else {
-        localStorage.setItem("token", data.signIn);
-        navigate("/");
+        getUserByMail({ variables: { email: emailValue } });
       }
     }
-  }, [data]);
+  }
+
+  useEffect(() => {
+    validateUser();
+  }, [data, getUserByMailData]);
+
+  useEffect(() => {
+    if (getUserByMailData) {
+      console.log(getUserByMailData);
+      localStorage.setItem("userId", getUserByMailData.user.id);
+      localStorage.setItem("userEmail", getUserByMailData.user.email);
+      localStorage.setItem("token", data.signIn);
+      navigate("/");
+    }
+  }, [getUserByMailData]);
 
   const loginHandler = () => {
     signIn({ variables: { email: emailValue, password: passwordValue } });

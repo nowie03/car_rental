@@ -10,6 +10,8 @@ export default function Nav({isMyListingsSelected,isMyBookingsSelected,isExplore
 
   const signOutHandler=()=>{
     localStorage.removeItem('token');
+    localStorage.removeItem('userID');
+    localStorage.removeItem('userEmail');
     navigate("/");
   }
     //state variables

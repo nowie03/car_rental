@@ -78,13 +78,14 @@ export default function Explore() {
             <Input
               label="Model"
               type="search"
+              autoComplete="off"
+
               onChange={(e) => setSearchText(e.target.value)}
             />
           </Col>
           <Col>
            <StateDropdown selected={selectedState} setSelected={setSelectedState}/>
           </Col>
-          
         </Row>
       </Grid>
       {console.log(selectedState.currentKey+" "+searchText+" "+data.cars[0].model.toLowerCase().startsWith(searchText))}
@@ -93,7 +94,7 @@ export default function Explore() {
          
           (!selectedState.currentKey || selectedState.currentKey==="all" || selectedState.currentKey===car.state) &&(searchText==="" || car.model.toLowerCase().startsWith(searchText)) &&
           <>
-           <PaymentModal make={car.make} model={car.model} price={car.pricePerKm} visible={visible} setVisible={setVisible}/>
+           <PaymentModal carId={car.id}  make={car.make} model={car.model} price={car.pricePerKm} visible={visible} setVisible={setVisible}/>
             <Grid xs={7}>
               <CarCard
                 name={car.make}

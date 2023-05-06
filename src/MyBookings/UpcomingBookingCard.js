@@ -1,42 +1,49 @@
 import React from "react";
 import { Card, Row, Button, Text, Grid,Avatar } from "@nextui-org/react";
+import { useMutation } from "@apollo/client";
+import { CANCEL_BOOKING } from "../GraphQL/Mutations";
 
-const BookingCard = () => {
+const BookingCard = ({id,car,startDate,endDate,toast}) => {
+
+  const [cancelBooking,{called,loading,data}]=useMutation(CANCEL_BOOKING);
+
+  const handleCancelBooking=()=>{
+    cancelBooking({variables:{id:id}})
+    toast.current.show({
+      severity: "success",
+      summary: "Cancelled Booking",
+    });
+  }
+
   return (
     <Card css={{margin:"20px"}}>
       <Card.Header>
       <Avatar
       squared
           alt="nextui logo"
-          src="https://images.unsplash.com/photo-1582639510494-c80b5de9f148?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=843&q=80"
+          src={car.imgurl}
           width="44px"
           height="44px"
         />
       <Grid.Container css={{ pl: "$6" }}>
           <Grid xs={12} css={{margin:"10px"}}>
             <Text h4 css={{ lineHeight: "$xs" }}>
-              TN 62 9846
+            {car.state.split(' ')[0][0]+car.state.split(' ')[1][0]+" "+car.regNumber}
             </Text>
           </Grid>
           <Grid xs={12}>
-            <Text css={{ color: "$accents8" }}>25-04-2023 to 27-04-2023</Text>
+            <Text css={{ color: "$accents8" }}>{startDate.split('T')[0]} to {endDate.split('T')[0]} </Text>
           </Grid>
         </Grid.Container>
       </Card.Header>
       <Card.Divider />
-      <Card.Body css={{ py: "$10" }}>
-        <Text>
-          Some quick example text to build on the card title and make up the
-          bulk of the card's content.
-        </Text>
-      </Card.Body>
-      <Card.Divider />
+      
       <Card.Footer>
         <Row justify="flex-end">
           <Button  css={{marginRight:"$2"}}size="sm" light>
             Contact Owner
           </Button>
-          <Button shadow color="error" size="sm">Cancel</Button>
+          <Button shadow color="error" size="sm" onClick={handleCancelBooking}>Cancel</Button>
         </Row>
       </Card.Footer>
     </Card>
