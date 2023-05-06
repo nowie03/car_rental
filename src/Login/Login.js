@@ -1,92 +1,102 @@
 import React, { useEffect, useState } from "react";
-import { Input, useInput, Grid, Button,Loading } from "@nextui-org/react";
-import { Link,useNavigate } from "react-router-dom";
-import { useQuery } from "@apollo/client";
+import { Input, useInput, Grid, Button, Loading } from "@nextui-org/react";
+import { Link, useNavigate } from "react-router-dom";
+import { useLazyQuery, useQuery } from "@apollo/client";
 import { GET_USER_BY_MAIL, SIGNIN } from "../GraphQL/Queries";
 
-
-const secretKey = 'my-secret-key';
+const secretKey = "my-secret-key";
 
 const Login = () => {
-    const navigate=useNavigate();
-    const {
-        value: emailValue,
-        reset: emailReset,
-        bindings: emailBindings,
-    } = useInput("");
-    const {
-        value: passwordValue,
-        reset: passwordReset,
-        bindings: passwordBindings,
-    } = useInput("");
+  const navigate = useNavigate();
+  const {
+    value: emailValue,
+    reset: emailReset,
+    bindings: emailBindings,
+  } = useInput("");
+  const {
+    value: passwordValue,
+    reset: passwordReset,
+    bindings: passwordBindings,
+  } = useInput("");
 
-    const {loading,error,data,refetch}=useQuery(SIGNIN,{
-        variables:{
-            email:emailValue,
-            password:passwordValue
-        }
-    });
+  const [signIn, { loading, error, data }] = useLazyQuery(SIGNIN, {
+    errorPolicy: "all",
+  });
 
-    const [emailStatus,setEmailStatus]=useState({color:"",text:""})
-    const [passwordStatus,setPasswordStatus]=useState({color:"",text:""})
-
+  const [emailStatus, setEmailStatus] = useState({ color: "", text: "" });
+  const [passwordStatus, setPasswordStatus] = useState({ color: "", text: "" });
 
   const validateEmail = (emailValue) => {
     return emailValue.match(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+.[A-Z]{2,4}$/i);
   };
 
-  const validatePassword = (passwordValue) => {
-    return false;
-  };
-
- 
-
-  useEffect(()=>{
-    if (!passwordValue)
+  useEffect(() => {
     setPasswordStatus({
       text: "",
       color: "",
-  })
-  if (!emailValue)
-  setEmailStatus({
-    text: "",
-    color: "",
-})
-  },[emailValue,passwordValue])
+    });
 
-  const loginHandler=()=>{
-    refetch({email:emailValue,password:passwordValue});
-    if(error){
-        setPasswordStatus({
-            text: "check your password",
-            color: "error",
-        })
-        setEmailStatus({
-            text:"check your email",
-            color:"error"
-        })
-    }
-    if(!loading && data){
-        setPasswordStatus({
-            text: "",
-            color: "",
-        })
-        setEmailStatus({
-            text:"",
-            color:""
-        })
-        localStorage.setItem('token',data.signIn)
-        navigate("/")
-       }
-    }
+    setEmailStatus({
+      text: "",
+      color: "",
+    });
+  }, [emailValue, passwordValue]);
 
-  
+  if (error) {
+    console.log(data);
+    // setPasswordStatus({
+    //     text: "check your password",
+    //     color: "error",
+    // })
+    // setEmailStatus({
+    //     text:"check your email",
+    //     color:"error"
+    // })
+  }
+  useEffect(() => {
+    if (!loading && data) {
+      setPasswordStatus({
+        text: "",
+        color: "",
+      });
+      setEmailStatus({
+        text: "",
+        color: "",
+      });
+      console.log(data);
+
+      if (
+        data.signIn.includes(
+          "HotChocolate.GraphQLException: password doesnt match"
+        )
+      ) {
+        setPasswordStatus({
+          text: "check your password",
+          color: "error",
+        });
+      } else if (
+        data.signIn.includes("HotChocolate.GraphQLException: user not found")
+      ) {
+        setEmailStatus({
+          text: "check your email",
+          color: "error",
+        });
+      } else {
+        localStorage.setItem("token", data.signIn);
+        navigate("/");
+      }
+    }
+  }, [data]);
+
+  const loginHandler = () => {
+    signIn({ variables: { email: emailValue, password: passwordValue } });
+  };
 
   return (
     <Grid.Container xs={12} justify="center" css={{ padding: "$15" }}>
       <Grid css={{ display: "flex", justifyContent: "center", margin: "$14" }}>
-        <Input 
-        id="#email"
+        <Input
+          id="#email"
           {...emailBindings}
           clearable
           shadow={false}
@@ -103,7 +113,7 @@ const Login = () => {
       </Grid>
       <Grid css={{ display: "flex", justifyContent: "center", margin: "$14" }}>
         <Input.Password
-        id="#password"
+          id="#password"
           {...passwordBindings}
           clearable
           onClearClick={passwordReset}
@@ -119,8 +129,13 @@ const Login = () => {
         />
       </Grid>
       <Grid css={{ display: "flex", justifyContent: "center", margin: "$14" }}>
-        <Button  color="gradient" css={{ marginRight: "10px" }} auto onClick={loginHandler}>
-        login
+        <Button
+          color="gradient"
+          css={{ marginRight: "10px" }}
+          auto
+          onClick={loginHandler}
+        >
+          login
         </Button>
 
         <Link to={"/signup"}>

@@ -1,11 +1,12 @@
 import React, { useEffect, useState,useRef } from "react";
 import { Input, useInput, Grid, Button,Loading ,Row,Col} from "@nextui-org/react";
 import { Link,useNavigate } from "react-router-dom";
-import { useQuery } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 import { GET_USER_BY_MAIL, SIGNIN } from "../GraphQL/Queries";
 import { Toast } from 'primereact/toast';
 import { FileUpload } from 'primereact/fileupload';
 import { Label } from "gestalt";
+import { CREATE_USER } from "../GraphQL/Mutations";
 
 const Signup = () => {
     const toast = useRef(null);
@@ -30,55 +31,65 @@ const Signup = () => {
         reset:phoneNumberReset,
         bindings:phoneNumberBindings
     }=useInput("")
-
-    const {loading,error,data,refetch}=useQuery(SIGNIN,{
-        variables:{
-            email:emailValue,
-            password:passwordValue
-        }
-    });
-
+    
     const [emailStatus,setEmailStatus]=useState({color:"",text:""})
     const [passwordStatus,setPasswordStatus]=useState({color:"",text:""})
     const [phoneNumberStatus,setPhoneNumberStatus]=useState({color:"",text:""})
 
+    useEffect(()=>{
+     
+      setPhoneNumberStatus({
+        text: "",
+        color: "",
+      })
+     
+      setEmailStatus({
+        text: "",
+        color: "",
+      })
+    },[emailValue,passwordValue])
+  
 
+    const [addUser,{loading,error,data,reset}]=useMutation(CREATE_USER,{
+        variables:{
+            email:emailValue,
+            password:passwordValue,
+            phoneNumber:phoneNumberValue,
+            imgUrl:""
+        }
+    });
 
-  const validateEmail = (emailValue) => {
-    return emailValue.match(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+.[A-Z]{2,4}$/i);
-  };
-
-  const validatePassword = (passwordValue) => {
-    return false;
-  };
-
- 
-
-  useEffect(()=>{
-    if (!passwordValue)
-    setPasswordStatus({
-      text: "",
-      color: "",
-  })
-  if (!emailValue)
-  setEmailStatus({
-    text: "",
-    color: "",
-})
-  },[emailValue,passwordValue])
-
-  const loginHandler=()=>{
-    refetch({email:emailValue,password:passwordValue});
-    if(error){
-        setPasswordStatus({
-            text: "check your password",
-            color: "error",
-        })
+    if (error) {
+      console.log(error.message);
+     
+      if (error.message === "Email already exists") {
         setEmailStatus({
-            text:"check your email",
-            color:"error"
-        })
+          text: "email already exists",
+          color: "error",
+        });
+        reset()
+      }
+  
+      if (error.message === "Phone number already exists") {
+        setPhoneNumberStatus({
+          text: "phone number already exists",
+          color: "error",
+        });
+        reset()
+      }
     }
+
+
+
+  
+  
+
+
+  
+  const loginHandler=()=>{
+    addUser({email:emailValue,password:passwordValue,phoneNumber:phoneNumberValue,imgUrl:""});
+
+    
     if(!loading && data){
         setPasswordStatus({
             text: "",
@@ -88,8 +99,8 @@ const Signup = () => {
             text:"",
             color:""
         })
-        localStorage.setItem('token',data.signIn)
-        navigate("/")
+        toast.current.show({ severity: 'info', summary: 'Success', detail: 'Account Created' });
+         navigate("/")
        }
     }
 
@@ -103,6 +114,7 @@ const Signup = () => {
         id="#email"
           {...emailBindings}
           clearable
+          initialValue=""
           shadow={false}
           onClearClick={emailReset}
           status={emailStatus.color}
@@ -120,6 +132,7 @@ const Signup = () => {
         id="#password"
           {...passwordBindings}
           clearable
+          
           onClearClick={passwordReset}
           color={passwordStatus.color}
           status={passwordStatus.color}
