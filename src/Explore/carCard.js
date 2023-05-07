@@ -1,4 +1,4 @@
-import { Card, Col, Row, Button, Text, User, Grid } from "@nextui-org/react";
+import { Card, Col, Avatar, Button, Text, User, Grid } from "@nextui-org/react";
 import { Icon, Flex } from "gestalt";
 import React, { useState, useEffect } from "react";
 import { Rating } from "primereact/rating";
@@ -7,10 +7,20 @@ import { Link } from "react-router-dom";
 import "./CarCard.css";
 import BasicRating from "../MyBookings/Rating";
 
-export default function CarCard({ name, imageSource, price, onClickHandler,model,kms,state,reg,owner,bookings }) {
+export default function CarCard({
+  name,
+  imageSource,
+  price,
+  onClickHandler,
+  model,
+  kms,
+  state,
+  reg,
+  owner,
+  bookings,
+}) {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
-
 
   return (
     <>
@@ -34,7 +44,8 @@ export default function CarCard({ name, imageSource, price, onClickHandler,model
                 New
               </Text>
               <Text h3 color="white">
-                {name}{ " "+model}
+                {name}
+                {" " + model}
               </Text>
             </Col>
           </Card.Header>
@@ -60,14 +71,10 @@ export default function CarCard({ name, imageSource, price, onClickHandler,model
           >
             <Grid.Container>
               <Grid xs={3} justify="flex-start">
-                <User
-                  src="https://i.pravatar.cc/150?u=a042581f4e29026704d"
-                  name={owner.email.split("@")[0]}
-                  zoomed
-                />
+                <Avatar squared text={owner.email.split("@")[0]}  size="lg"/>
               </Grid>
               <Grid xs={3}>
-                <BasicRating/>
+                <BasicRating />
               </Grid>
               <Grid xs={2}>
                 <Text
@@ -76,7 +83,10 @@ export default function CarCard({ name, imageSource, price, onClickHandler,model
                   transform="uppercase"
                   color="black"
                 >
-                  {state.split(" ")[0][0]+state.split(" ")[1][0]+ " "}{reg}
+                  {state.split(" ").length > 1
+                    ? [0][0] + state.split(" ")[1][0] + " "
+                    : state[0] + " "}
+                  {reg}
                 </Text>
               </Grid>
               <Grid xs={2}>
@@ -101,7 +111,7 @@ export default function CarCard({ name, imageSource, price, onClickHandler,model
                     weight="bold"
                     transform="uppercase"
                   >
-                    {"$ "+price}
+                    {"$ " + price}
                   </Text>
                 </Button>
               </Grid>

@@ -1,18 +1,32 @@
 import React, { useEffect, useRef } from "react";
 import BookingCard from "./UpcomingBookingCard";
 import PreviousBookingCard from "./PreviousBookingCard";
-import { Collapse, Text, Grid } from "@nextui-org/react";
-import { useQuery, useSubscription } from "@apollo/client";
+import {
+  Collapse,
+  Text,
+  Grid,
+  Modal,
+  Textarea,
+  Button,
+  Row,
+  Checkbox,
+  useInput,
+} from "@nextui-org/react";
+import { useMutation, useQuery, useSubscription } from "@apollo/client";
 import { GET_BOOKINGS } from "../GraphQL/Queries";
-import { ON_BOOKING_CREATE, ON_BOOKING_DELETE, OnBookingDelete } from "../GraphQL/Subscription";
+import {
+  ON_BOOKING_CREATE,
+  ON_BOOKING_DELETE,
+  OnBookingDelete,
+} from "../GraphQL/Subscription";
 import { Toast } from "primereact/toast";
+import { CREATE_COMMENT } from "../GraphQL/Mutations";
 
 const seggregateBookings = (bookings) => {
   const upcomingBookings = [],
     previousBookings = [];
 
   bookings.map((booking) => {
-    console.log(new Date() <= booking.endDate);
     if (new Date(booking.endDate) >= Date.now()) upcomingBookings.push(booking);
     else previousBookings.push(booking);
   });
@@ -29,36 +43,46 @@ const MyBooking = () => {
       },
     }
   );
-  
 
-  const subscribeToDelete = subscribeToMore({
-    document: ON_BOOKING_DELETE,
-    variables: {
-      userId: parseInt(localStorage.getItem("userId")),
-    },
-    updateQuery: (prev, { subscriptionData }) => {
-      console.log(prev);
-      const updatedBookings = prev.userBookings.filter(
-        (item) => item.id !== subscriptionData.data.onBookingDelete.id
-      );
-      return { userBookings: updatedBookings };
-    },
-  });
+  const closeHandler = () => {
+    setVisible(false);
+    console.log("closed");
+  };
 
-  const subscribeToAdd=subscribeToMore({
-    document:ON_BOOKING_CREATE,
-    variables:{
-      userId: parseInt(localStorage.getItem("userId")),
-    },
-    updateQuery:(prev,{subscriptionData})=>{
-      console.log(prev,subscriptionData)
-      const updatedBookings=[...prev.userBookings,subscriptionData.data.onBookingCreate]
-      return {userBookings:updatedBookings}
-    }
-  })
+
+
+  const [visible, setVisible] = React.useState(false);
+  const handler = () => setVisible(true);
+ 
 
   useEffect(() => {
-   
+    const subscribeToDelete = subscribeToMore({
+      document: ON_BOOKING_DELETE,
+      variables: {
+        userId: parseInt(localStorage.getItem("userId")),
+      },
+      updateQuery: (prev, { subscriptionData }) => {
+        const updatedBookings = prev.userBookings.filter(
+          (item) => item.id !== subscriptionData.data.onBookingDelete.id
+        );
+        return { userBookings: updatedBookings };
+      },
+    });
+
+    const subscribeToAdd = subscribeToMore({
+      document: ON_BOOKING_CREATE,
+      variables: {
+        userId: parseInt(localStorage.getItem("userId")),
+      },
+      updateQuery: (prev, { subscriptionData }) => {
+        const updatedBookings = [
+          ...prev.userBookings,
+          subscriptionData.data.onBookingCreate,
+        ];
+        return { userBookings: updatedBookings };
+      },
+    });
+
     return () => {
       subscribeToDelete();
       subscribeToAdd();
@@ -80,7 +104,7 @@ const MyBooking = () => {
         <Grid.Container>
           {!loading &&
             upcomingBookings.map((booking) => (
-              <Grid  Grid xs={12} css={{ margin: "10px" }}>
+              <Grid Grid xs={12} css={{ margin: "10px" }}>
                 <BookingCard
                   refetch={refetch}
                   id={booking.id}
@@ -104,6 +128,10 @@ const MyBooking = () => {
                   car={booking.bookedCar}
                   startDate={booking.startDate}
                   endDate={booking.endDate}
+                  onPress={handler}
+                  closeHandler={closeHandler}
+                  visible={visible}
+                  toast={toast}
                 />
               </Grid>
             ))}

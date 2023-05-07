@@ -1,11 +1,14 @@
-import React,{useState} from "react";
+import React,{useState,useEffect} from "react";
 import { Grid, Text } from "@nextui-org/react";
 import { Rating } from "primereact/rating";
 import { Link } from "react-router-dom";
 import { SplitButton } from 'primereact/splitbutton';
 import { Toast } from 'primereact/toast';
+import { useMutation } from "@apollo/client";
+import { DELETE_CAR } from "../GraphQL/Mutations";
 
 const CardBodyNonEdit = ({
+  id,
   name,
   model,
   year,
@@ -19,16 +22,19 @@ const CardBodyNonEdit = ({
   setEditMode
 }) => {
     const [changeLoading,setChangeLoading]=useState(false);
-    const[label,setLabel]=useState("Update");
+    const[label,setLabel]=useState("Delete");
+    console.log(id)
+
+    const [deleteCar,{loading,error,data}]=useMutation(DELETE_CAR);
+
+    useEffect(()=>{
+      if(error){
+      console.log(error.message)
+      toast.current.show({severity:"error",summary:"Cannot Delete ",detail:"cannot delete a car when its already booked"})
+      }
+    },[error])
     
       const items = [
-          {
-              label: 'Update',
-              icon: 'pi pi-refresh',
-              command: () => {
-                setLabel("Update")
-              }
-          },
           {
               label: 'Delete',
               icon: 'pi pi-times',
@@ -36,25 +42,19 @@ const CardBodyNonEdit = ({
                 setLabel("Delete");
               }
           },
-          {
-              label: 'Upload',
-              icon: 'pi pi-upload',
-              command: () => {
-                  //router.push('/fileupload');
-              }
-          }
       ];
   
       const save = () => {
       //setChangeLoading(true);
 
-        if(label==="Update")
-          setEditMode(true);
+
 
         if(label==="Delete")
-            toast.current.show({ severity: 'error', summary: 'Success', detail: 'Data Deleted' });
-
-  
+           {
+            deleteCar({variables:{
+              id:id
+            }})
+           }
        
     };
   

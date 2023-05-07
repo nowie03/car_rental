@@ -1,24 +1,23 @@
 import { Navbar, Link, Text, Avatar, Dropdown } from "@nextui-org/react";
 import { Layout } from "./Layout";
-import React,{useState} from "react";
-import { act } from "react-dom/test-utils";
-import { useNavigate } from "react-router-dom";
+import React, { useState } from "react";
+import { useNavigate ,Outlet} from "react-router-dom";
 
+export default function Nav({
+}) {
+  const navigate = useNavigate();
 
-export default function Nav({isMyListingsSelected,isMyBookingsSelected,isExploreSelected,setIsExploreSelected,setIsMyBookingsSelected,setIsMyListingsSelected}) {
-  const navigate=useNavigate();
-
-  const signOutHandler=()=>{
-    localStorage.removeItem('token');
-    localStorage.removeItem('userID');
-    localStorage.removeItem('userEmail');
+  const signOutHandler = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("userID");
+    localStorage.removeItem("userEmail");
     navigate("/");
-  }
-    //state variables
+  };
+  //state variables
   const collapseItems = [
     "Profile",
     "Dashboard",
-    "Activity",
+    "Activity", 
     "Analytics",
     "System",
     "Deployments",
@@ -28,9 +27,7 @@ export default function Nav({isMyListingsSelected,isMyBookingsSelected,isExplore
     "Log Out",
   ];
 
-  const handleNavLinkChange=(isSelected)=>{
-    console.log(isSelected);
-  }
+  const handleNavLinkChange = (isSelected) => {};
 
   return (
     <Layout>
@@ -43,9 +40,7 @@ export default function Nav({isMyListingsSelected,isMyBookingsSelected,isExplore
             },
           }}
         >
-          <Text b color="inherit" hideIn="xs">
-            CAR RENTAL
-          </Text>
+            <Link href="/home/explore">CAR RENTAL</Link>
         </Navbar.Brand>
         <Navbar.Content
           enableCursorHighlight
@@ -53,20 +48,21 @@ export default function Nav({isMyListingsSelected,isMyBookingsSelected,isExplore
           hideIn="xs"
           variant="highlight-rounded"
         >
-          <Navbar.Link isActive={isExploreSelected} onClick={()=>{
-            setIsExploreSelected(true)
-            setIsMyBookingsSelected(false)
-            setIsMyListingsSelected(false)
-            }} href="#">Explore</Navbar.Link>
-          <Navbar.Link isActive={isMyBookingsSelected} onClick={()=>{ 
-            setIsMyBookingsSelected(true)
-            setIsExploreSelected(false)
-            setIsMyListingsSelected(false)}}  href="#">My Bookings</Navbar.Link>
-          <Navbar.Link isActive={isMyListingsSelected} onClick={()=>{ 
-            setIsMyListingsSelected(true)
-            setIsExploreSelected(false)
-            setIsMyBookingsSelected(false)
-            }} href="#">My Listings</Navbar.Link>
+          <Navbar.Link  
+            href="/home/explore"
+          >
+            Explore
+          </Navbar.Link>
+          <Navbar.Link
+            href="/home/bookings"
+          >
+            My Bookings
+          </Navbar.Link>
+          <Navbar.Link
+            href="/home/listings"
+          >
+            My Listings
+          </Navbar.Link>
         </Navbar.Content>
         <Navbar.Content
           css={{
@@ -84,35 +80,25 @@ export default function Nav({isMyListingsSelected,isMyBookingsSelected,isExplore
                   as="button"
                   color="secondary"
                   size="md"
-                  src="https://i.pravatar.cc/150?u=a042581f4e29026704d"
+                  text={localStorage.getItem('userEmail').split('@')[0]}
                 />
               </Dropdown.Trigger>
             </Navbar.Item>
             <Dropdown.Menu
               aria-label="User menu actions"
               color="secondary"
-              onAction={(actionKey) => (actionKey==="logout")?signOutHandler():0}
+              onAction={(actionKey) =>
+                actionKey === "logout" ? signOutHandler() : 0
+              }
             >
               <Dropdown.Item key="profile" css={{ height: "$18" }}>
                 <Text b color="inherit" css={{ d: "flex" }}>
                   Signed in as
                 </Text>
                 <Text b color="inherit" css={{ d: "flex" }}>
-                  zoey@example.com
+                 {localStorage.getItem('userEmail')}
                 </Text>
-              </Dropdown.Item>
-              <Dropdown.Item key="settings" withDivider>
-                My Settings
-              </Dropdown.Item>
-              <Dropdown.Item key="team_settings">Team Settings</Dropdown.Item>
-              <Dropdown.Item key="analytics" withDivider>
-                Analytics
-              </Dropdown.Item>
-              <Dropdown.Item key="system">System</Dropdown.Item>
-              <Dropdown.Item key="configurations">Configurations</Dropdown.Item>
-              <Dropdown.Item key="help_and_feedback" withDivider>
-                Help & Feedback
-              </Dropdown.Item>
+                </Dropdown.Item>
               <Dropdown.Item key="logout" withDivider color="error">
                 Log Out
               </Dropdown.Item>
@@ -142,6 +128,7 @@ export default function Nav({isMyListingsSelected,isMyBookingsSelected,isExplore
           ))}
         </Navbar.Collapse>
       </Navbar>
+      <Outlet />
     </Layout>
   );
 }

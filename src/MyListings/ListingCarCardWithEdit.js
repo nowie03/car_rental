@@ -30,23 +30,7 @@ export default function ListingCarCard({
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // useEffect(() => {
-  //     const fetchData = async () => {
-  //         const response = await fetch('car', {
-  //             headers: {
-  //                 'Authorization': `Bearer #1536188#@$!%`
-  //             }
 
-  //         });
-  //         const data = await response.json();
-  //         setData(data);
-  //         console.log(data);
-  //         setLoading(false);
-  //     }
-
-  //     fetchData();
-
-  // }, []);
 
   return (
     <>

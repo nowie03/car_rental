@@ -34,8 +34,8 @@ export const GET_CARS = gql`
 `;
 
 export const GET_LISTINGS = gql`
-  query {
-    ownedCars(userId: 1) {
+  query ownedCars($userId: Int!) {
+    ownedCars(userId: $userId) {
       id
       make
       model
@@ -66,7 +66,7 @@ export const GET_LISTINGS = gql`
 export const GET_BOOKINGS = gql`
   query userBookings($userId: Int!) {
     userBookings(userId: $userId) {
-      id,
+      id
       startDate
       endDate
       bookedCar {
@@ -80,11 +80,7 @@ export const GET_BOOKINGS = gql`
         state
         district
         kmsDriven
-        owner {
-          id
-          email
-          phoneNumber
-        }
+       
       }
     }
   }
@@ -93,16 +89,15 @@ export const GET_BOOKINGS = gql`
 export const GET_USER_BY_MAIL = gql`
   query user($email: String!) {
     user(email: $email) {
-      id,
+      id
       email
       password
     }
   }
 `;
 
-export const SIGNIN=gql`query
-signin($email:String!,$password:String!){
-signIn(email: $email,password:$password) 
-}`;
-
-
+export const SIGNIN = gql`
+  query signin($email: String!, $password: String!) {
+    signIn(email: $email, password: $password)
+  }
+`;

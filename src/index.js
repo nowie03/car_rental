@@ -15,7 +15,7 @@ import "primereact/resources/themes/lara-light-indigo/theme.css";
 //core
 import "primereact/resources/primereact.min.css";
 
-import Car from "./Car";
+import "primeicons/primeicons.css";
 
 import {
   ApolloClient,
@@ -25,72 +25,94 @@ import {
   split,
   HttpLink,
 } from "@apollo/client";
-import { GraphQLWsLink } from '@apollo/client/link/subscriptions';
-import { createClient } from 'graphql-ws';
-import { getMainDefinition } from '@apollo/client/utilities';
+import { GraphQLWsLink } from "@apollo/client/link/subscriptions";
+import { createClient } from "graphql-ws";
+import { getMainDefinition } from "@apollo/client/utilities";
 
 import { createBrowserRouter, Route, RouterProvider } from "react-router-dom";
 import Signup from "./Login/Signup";
 import RouteGuard from "./RouteGuard";
+import MyBooking from "./MyBookings";
+import BasicTabs from "./MyListings";
+import Explore from "./Explore";
 
 const router = createBrowserRouter([
   {
-  path:"/",
-  element:<RouteGuard/>,
-  children:[{
-    path:"",
-    element:<App/>
-  }]
+    path: "/",
+    element: <RouteGuard />,
+    children: [
+      {
+        path: "/home",
+        element: <App />,
+        children:[
+          {
+            path:"/home/bookings",
+            element:<MyBooking/>
+          },
+          {
+            path:"/home/listings",
+            element:<BasicTabs/>
+          },
+          {
+            path:"/home/explore",
+            element:<Explore/>
+          }
+        ]
+      },
+     
+    ],
   },
   {
     // path: "/",
     // element: <App />,
-    path:"/login",
-    element:<Login/>,
+    path: "/login",
+    element: <Login />,
   },
   {
-    path:"/signup",
-    element:<Signup/>
-  }
+    path: "/signup",
+    element: <Signup />,
+  },
 ]);
 
 const httpLink = new HttpLink({
-  uri: 'http://localhost:5213/graphql'
+  uri: "http://localhost:5213/graphql",
 });
 
-const wsLink = new GraphQLWsLink(createClient({
-  url: 'ws://localhost:5213/graphql',
-  options: {
-    reconnect: true, // Enable automatic reconnection
-  },
-}));
+const wsLink = new GraphQLWsLink(
+  createClient({
+    url: "ws://localhost:5213/graphql",
+    options: {
+      reconnect: true, // Enable automatic reconnection
+    },
+  })
+);
 
 const splitLink = split(
   ({ query }) => {
     const definition = getMainDefinition(query);
     return (
-      definition.kind === 'OperationDefinition' &&
-      definition.operation === 'subscription'
+      definition.kind === "OperationDefinition" &&
+      definition.operation === "subscription"
     );
   },
   wsLink,
-  httpLink,
+  httpLink
 );
 
 const client = new ApolloClient({
-  link:splitLink,
+  link: splitLink,
   cache: new InMemoryCache(),
-  credentials: 'include'
+  credentials: "include",
 });
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <ApolloProvider client={client}>
-  <NextUIProvider>
-    <React.StrictMode>
-      <RouterProvider router={router} />
-    </React.StrictMode>
-  </NextUIProvider>
+    <NextUIProvider>
+      <React.StrictMode>
+        <RouterProvider router={router} />
+      </React.StrictMode>
+    </NextUIProvider>
   </ApolloProvider>
 );
 

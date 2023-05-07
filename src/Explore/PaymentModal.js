@@ -14,13 +14,18 @@ import {
 } from "@nextui-org/react";
 import { useMutation } from "@apollo/client";
 import { CREATE_BOOKING } from "../GraphQL/Mutations";
-import { Toast } from "primereact/toast";
 
-const PaymentModal = ({ carId, make, model, price, visible, setVisible }) => {
+const PaymentModal = ({
+  toast,
+  carId,
+  make,
+  model,
+  price,
+  visible,
+  setVisible,
+}) => {
   const [addBooking, { loading, error, data, reset }] =
     useMutation(CREATE_BOOKING);
-
-  const toast = useRef(null);
 
   const {
     value: startDateValue,
@@ -42,26 +47,6 @@ const PaymentModal = ({ carId, make, model, price, visible, setVisible }) => {
 
   const [validEndDate, setValidEndDate] = useState(true);
 
-  const paymentHandler = () => {
-    addBooking({
-      variables: {
-        userId: parseInt(localStorage.getItem("userId")),
-        carId: carId,
-        startDate: startDateValue,
-        endDate: endDateValue,
-      },
-    });
-
-    if(!loading && !error)
-     { toast.current.show({
-        severity: "success",
-        summary: "Booked Car Successfully",
-      });
-      setTimeout(()=>
-      setVisible(false),500);
-    }
-  };
-
   useEffect(() => {
     if (error)
       toast.current.show({
@@ -69,7 +54,25 @@ const PaymentModal = ({ carId, make, model, price, visible, setVisible }) => {
         summary: "Cannot Book Car",
         detail: "car is already booked",
       });
+      setVisible(false)
   }, [error]);
+
+  const paymentHandler =async () => {
+    await addBooking({
+      variables: {
+        userId: parseInt(localStorage.getItem("userId")),
+        carId: carId,
+        startDate: startDateValue,
+        endDate: endDateValue,
+      },
+    });
+    if(!error){
+      toast.current.show({ severity: "success",
+      summary: " Booked Car",
+     })
+    }
+    setVisible(false);
+  };
 
   useEffect(() => {
     if (startDateValue > endDateValue) setValidEndDate(false);
@@ -80,11 +83,9 @@ const PaymentModal = ({ carId, make, model, price, visible, setVisible }) => {
     setVisible(false);
     startDateReset();
     endDateReset();
-    console.log("closed");
   };
   return (
     <Modal blur noPadding open={visible} onClose={closeHandler}>
-      <Toast ref={toast}></Toast>
       <Card>
         <Card.Header>
           <Text b>Rent car</Text>

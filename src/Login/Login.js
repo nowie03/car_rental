@@ -57,7 +57,6 @@ const Login = () => {
         text: "",
         color: "",
       });
-      console.log(data);
 
       if (
         data.signIn.includes(
@@ -87,11 +86,11 @@ const Login = () => {
 
   useEffect(() => {
     if (getUserByMailData) {
-      console.log(getUserByMailData);
+
       localStorage.setItem("userId", getUserByMailData.user.id);
       localStorage.setItem("userEmail", getUserByMailData.user.email);
       localStorage.setItem("token", data.signIn);
-      navigate("/");
+      navigate("/home/explore");
     }
   }, [getUserByMailData]);
 

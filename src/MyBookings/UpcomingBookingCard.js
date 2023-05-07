@@ -28,7 +28,8 @@ const BookingCard = ({id,car,startDate,endDate,toast}) => {
       <Grid.Container css={{ pl: "$6" }}>
           <Grid xs={12} css={{margin:"10px"}}>
             <Text h4 css={{ lineHeight: "$xs" }}>
-            {car.state.split(' ')[0][0]+car.state.split(' ')[1][0]+" "+car.regNumber}
+            {/* {car.state.split(' ')[0][0]+car.state.split(' ')[1][0]+" "+car.regNumber} */}
+            {car.state.split(" ").length>1? [0][0]+car.state.split(" ")[1][0]+ " ":car.state[0]+" "}{car.regNumber}
             </Text>
           </Grid>
           <Grid xs={12}>

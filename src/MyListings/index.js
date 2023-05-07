@@ -1,91 +1,73 @@
-import React, { useState,useRef } from "react";
-import { Text, Grid, Input } from "@nextui-org/react";
-import ListingCarCardEdit from "./ListingCarCardWithEdit";
-import ListingCarCard from "./ListingCard";
-import { ScrollPanel } from "primereact/scrollpanel";
-import { SpeedDial } from 'primereact/speeddial'; 
-import { Datapoint } from "gestalt";
-import "gestalt/dist/gestalt.css";
-import { useQuery } from "@apollo/client";
-import { GET_LISTINGS } from "../GraphQL/Queries";
-import { Toast } from 'primereact/toast';
+import * as React from "react";
+import PropTypes from "prop-types";
+import Tabs from "@mui/material/Tabs";
+import Tab from "@mui/material/Tab";
+import Typography from "@mui/material/Typography";
+import Box from "@mui/material/Box";
+import CarsList from "./CarsList";
+import AddCar from "./AddCar"
 
-const MyListings = () => {
-  const [searchText, setSearchText] = useState("");
-  const toast = useRef(null);
+function TabPanel(props) {
+  const { children, value, index, ...other } = props;
 
-  const {loading,error,data,refetch}=useQuery(GET_LISTINGS);
-
-  if(error){
-    console.log(error)
-    return <p>{error.message}</p>
-  }
-  console.log(data);
-
-  
-
-  
   return (
-
-    <div style={{ position: 'relative',height:"100%"}}>
-      <Toast ref={toast}></Toast>
-      <Grid.Container justify="space-around">
-        <Grid xs={12} css={{ marginTop: "30px" }}>
-          <Text h3>Take A Look At Your Cars....</Text>
-        </Grid>
-
-        {!loading && data.ownedCars.map((car) => (
-          <>
-            <Grid xs={7}>
-              <ListingCarCard
-              toast={toast}
-               name={car.make}
-               model={car.model}
-               reg={car.regNumber}
-               state={car.state}
-               kms={car.kmsDriven}
-               year={car.year}
-               rating={car.rating}
-               imageSource={car.imgUrl}
-               price={car.pricePerKm}
-               owner={car.owner}
-               bookings={car.bookings.length}
-               district={car.district}
-              />
-            </Grid>
-            <Grid xs={3}>
-              <ScrollPanel
-                style={{ width: "100%", height: "400px", padding: "5px" }}
-                className="custombar1"
-              >
-                <Datapoint
-                  size="sm"
-                  title="Total Bookings"
-                  tooltipText="The number of times your car has been booked"
-                  trend={{ value: 30, accessibilityLabel: "Trending up" }}
-                  value={car.bookings.length}
-                />
-                <Datapoint
-                size="sm"
-                title="Total Kms Driven"
-                tooltipText="The total Kms driven since this car has been listed"
-                trend={{ value: 10, accessibilityLabel: "Trending up" }}
-                value={car.kmsDriven}
-              />
-                <Datapoint
-                  size="sm"
-                  title="Total Revenue"
-                  tooltipText="The total revenue generated from this car"
-                  trend={{ value: 10, accessibilityLabel: "Trending up" }}
-                  value={parseInt(car.kmsDriven)*parseFloat(car.pricePerKm)}
-                />
-              </ScrollPanel>
-            </Grid>
-          </>
-        ))}
-      </Grid.Container>
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`simple-tabpanel-${index}`}
+      aria-labelledby={`simple-tab-${index}`}
+      {...other}
+    >
+      {value === index && (
+        <Box sx={{ p: 3 }}>
+          <Typography>{children}</Typography>
+        </Box>
+      )}
     </div>
   );
+}
+
+TabPanel.propTypes = {
+  children: PropTypes.node,
+  index: PropTypes.number.isRequired,
+  value: PropTypes.number.isRequired,
 };
 
-export default MyListings;
+function a11yProps(index) {
+  return {
+    id: `simple-tab-${index}`,
+    "aria-controls": `simple-tabpanel-${index}`,
+  };
+}
+
+export default function BasicTabs() {
+  const [value, setValue] = React.useState(0);
+
+  const handleChange = (event, newValue) => {
+    setValue(newValue);
+  };
+
+  return (
+    <Box sx={{ width: "100%" }}>
+      <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+        <Tabs
+          textColor="secondary"
+          indicatorColor="secondary"
+          centered
+          value={value}
+          onChange={handleChange}
+          aria-label="basic tabs example"
+        >
+          <Tab label="View Listed Cars" {...a11yProps(0)} />
+          <Tab label="List a Car" {...a11yProps(1)} />
+        </Tabs>
+      </Box>
+      <TabPanel value={value} index={0}>
+        <CarsList/>
+      </TabPanel>
+      <TabPanel value={value} index={1}>
+        <AddCar/>
+      </TabPanel>
+    </Box>
+  );
+}

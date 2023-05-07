@@ -100,7 +100,7 @@ const Signup = () => {
             color:""
         })
         toast.current.show({ severity: 'info', summary: 'Success', detail: 'Account Created' });
-         navigate("/")
+         navigate("/home/explore")
        }
     }
 

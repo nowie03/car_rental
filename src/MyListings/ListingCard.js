@@ -18,6 +18,7 @@ import CardBodyNonEdit from "./CardBodyNonEdit";
 import CardBodyEdit from "./CarBodyEdit";
 
 export default function ListingCarCard({
+  id,
   toast,
   rating,
   district,
@@ -34,6 +35,8 @@ export default function ListingCarCard({
 }) {
   const [editMode, setEditMode] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  
 
   return (
     <>
@@ -59,6 +62,7 @@ export default function ListingCarCard({
             >
               {!editMode && (
                 <CardBodyNonEdit
+                id={id}
                   toast={toast}
                   name={name}
                   model={model}
